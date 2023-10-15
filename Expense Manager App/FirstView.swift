@@ -11,27 +11,72 @@ struct FirstView: View {
     // MARK: Propeties
     @StateObject var expenses = Expenses()
     @State private var showingAddNewExpenseModal = false
-    
+    let types = ["Business", "Personal"]
+
     // MARK: Body
     var body: some View {
         NavigationStack{
             List {
-                ForEach(expenses.items, id: \.id) { item in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
-                                .foregroundStyle(.secondary)
+                
+                Section {
+                    ForEach(expenses.items.filter {$0.type == types[0] }) { item in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(item.amount, format: .currency(code: CustomLocaleCurrent.currency ?? "USD"))
+                                .foregroundStyle((item.amount < 10) ? .green : ((item.amount > 100) ? .red : .primary))
                         }
-                        
-                        Spacer()
-                        
-                        Text(item.amount, format: .currency(code: CustomLocaleCurrent.currency ?? "USD"))
-                            .foregroundStyle((item.amount < 10) ? .green : ((item.amount > 100) ? .red : .primary))
                     }
+                    .onDelete(perform: removeItems)
                 }
-                .onDelete(perform: removeItems)
+                
+                Section {
+                    ForEach(expenses.items.filter {$0.type == types[1] }) { item in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                                    .foregroundStyle(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            Text(item.amount, format: .currency(code: CustomLocaleCurrent.currency ?? "USD"))
+                                .foregroundStyle((item.amount < 10) ? .green : ((item.amount > 100) ? .red : .primary))
+                        }
+                    }
+                    .onDelete(perform: removeItems)
+                }
+                
+//                Section {
+//                    ForEach(expenses.items) { item in
+//                        HStack {
+//                            VStack(alignment: .leading) {
+//                                Text(item.name)
+//                                    .font(.headline)
+//                                Text(item.type)
+//                                    .foregroundStyle(.secondary)
+//                            }
+//                            
+//                            Spacer()
+//                            
+//                            Text(item.amount, format: .currency(code: CustomLocaleCurrent.currency ?? "USD"))
+//                                .foregroundStyle((item.amount < 10) ? .green : ((item.amount > 100) ? .red : .primary))
+//                        }
+//                    }
+//                    .onDelete(perform: removeItems)
+//                }
+//
+//                
+                
             }
             
             
