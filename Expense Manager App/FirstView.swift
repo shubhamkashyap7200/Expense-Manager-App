@@ -7,32 +7,52 @@
 
 import SwiftUI
 
-struct User: Codable {
-    let firstName: String
-    let secondName: String
-}
-
 struct FirstView: View {
     // MARK: Propeties
-    @State private var user = User(firstName: "Shubham", secondName: "Kashyap")
+    @StateObject var expenses = Expenses()
+    @State private var showingAddNewExpenseModal = false
     
     // MARK: Body
     var body: some View {
-        VStack {
-            Button("Save User") {
-                let encoder = JSONEncoder()
-                
-                if let data = try? encoder.encode(user) {
-                    UserDefaults.standard.setValue(data, forKey: "customUser")
+        NavigationStack{
+            List {
+                ForEach(expenses.items, id: \.id) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                                .foregroundStyle(.secondary)
+                        }
+                        
+                        Spacer()
+                        
+                        Text(item.amount, format: .currency(code: CustomLocaleCurrent.currency ?? "USD"))
+                            .foregroundStyle((item.amount < 10) ? .green : ((item.amount > 100) ? .red : .primary))
+                    }
                 }
+                .onDelete(perform: removeItems)
             }
             
-            Text("\(user.firstName) \(user.secondName)")
+            
+            .navigationTitle("Expense calculator")
+            .toolbar {
+                Button {                    
+                    showingAddNewExpenseModal = true
+                } label: {
+                    Image(systemName: "plus")
+                }
+                .sheet(isPresented: $showingAddNewExpenseModal) {
+                    AddView(expenses: expenses)
+                }
+            }
         }
-        
     }
     
     // MARK: Methods
+    private func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
+    }
 }
 
 #Preview {
@@ -40,7 +60,42 @@ struct FirstView: View {
 }
 
 
+// MARK: User defaults storing more complex data
 
+//struct User: Codable {
+//    let firstName: String
+//    let secondName: String
+//}
+
+//struct FirstView: View {
+//    // MARK: Propeties
+//    @State private var user = User(firstName: "Shubham", secondName: "Kashyap")
+//    
+//    // MARK: Body
+//    var body: some View {
+//        VStack {
+//            Button("Save User") {
+//                let encoder = JSONEncoder()
+//                
+//                if let data = try? encoder.encode(user) {
+//                    UserDefaults.standard.setValue(data, forKey: "customUser")
+//                }
+//            }
+//            
+//            Text("\(user.firstName) \(user.secondName)")
+//        }
+//        
+//    }
+//    
+//    // MARK: Methods
+//}
+//
+//#Preview {
+//    FirstView()
+//}
+//
+//
+//
 // MARK: App storage - storing data in swift ui property wrapper called AppStorage
 //
 //struct FirstView: View {
